@@ -33,4 +33,19 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private BankAccount bankAccount;
+
+    public void setAmount(BigDecimal amount) {
+    }
+
+    public void setTransactionDate(LocalDateTime now) {
+    }
+
+    public void setDescription(String s) {
+    }
+
+    public void setType(TransactionType transactionType) {
+    }
+
+    public void setBankAccount(BankAccount account) {
+    }
 }

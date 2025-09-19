@@ -1,6 +1,5 @@
 package com.Bank.Management.entity;
 
-import com.Bank.Management.entity.BankAccount;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
