@@ -1,15 +1,8 @@
 package com.Bank.Management.entity;
 
-import com.Bank.Management.entity.BankAccount;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.util.Set;
+import java.util.HashSet; // Importa HashSet
 
 @Entity
 @Table(name = "users")
@@ -22,58 +15,57 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
-    private String password;
-
     @Column(nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BankAccount> accounts;
+    @Column(nullable = false)
+    private String password;
 
-    // Constructor vacío (necesario para JPA)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BankAccount> bankAccounts = new HashSet<>(); // Inicializa la lista
+
+    // Constructor sin argumentos requerido por JPA
     public User() {
     }
 
-    // Getters
+    // Getters y Setters
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getPassword() {
-        return password;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public Set<BankAccount> getAccounts() {
-        return accounts;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    // Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public Set<BankAccount> getBankAccounts() {
+        return bankAccounts;
     }
 
-    public void setAccounts(Set<BankAccount> accounts) {
-        this.accounts = accounts;
+    public void setBankAccounts(Set<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
 }

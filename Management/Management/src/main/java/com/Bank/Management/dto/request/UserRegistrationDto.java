@@ -6,7 +6,9 @@ public class UserRegistrationDto {
     private String email;
     private String password;
 
-    // Getters y Setters
+    public UserRegistrationDto() {
+    }
+
     public String getUsername() {
         return username;
     }
