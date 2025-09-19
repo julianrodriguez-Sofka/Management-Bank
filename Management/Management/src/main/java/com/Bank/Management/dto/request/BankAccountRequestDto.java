@@ -1,19 +1,34 @@
 package com.Bank.Management.dto.request;
 
-import lombok.Data;
-import java.math.BigDecimal;
-
-@Data
-
 public class BankAccountRequestDto {
-    private Long userId;
-    private BigDecimal initialBalance;
 
-    public long getUserId() {
-        return 0;
+    private Long userId;
+    private double initialBalance;
+
+    // Constructor sin argumentos
+    public BankAccountRequestDto() {
     }
 
-    public BigDecimal getInitialBalance() {
-        return null;
+    // Constructor con argumentos
+    public BankAccountRequestDto(Long userId, double initialBalance) {
+        this.userId = userId;
+        this.initialBalance = initialBalance;
+    }
+
+    // Getters y Setters
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public double getInitialBalance() {
+        return initialBalance;
+    }
+
+    public void setInitialBalance(double initialBalance) {
+        this.initialBalance = initialBalance;
     }
 }

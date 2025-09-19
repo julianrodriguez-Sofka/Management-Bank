@@ -6,6 +6,7 @@ import com.Bank.Management.service.BankAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -21,5 +22,11 @@ public class BankAccountController {
     public ResponseEntity<BankAccountResponseDto> createAccount(@RequestBody BankAccountRequestDto bankAccountRequestDto) {
         BankAccountResponseDto newAccount = bankAccountService.createAccount(bankAccountRequestDto);
         return new ResponseEntity<>(newAccount, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BankAccountResponseDto>> getAllAccounts() {
+        List<BankAccountResponseDto> accounts = bankAccountService.getAllAccounts();
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 }

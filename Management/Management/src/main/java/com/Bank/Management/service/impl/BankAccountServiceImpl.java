@@ -9,6 +9,8 @@ import com.Bank.Management.repository.BankAccountRepository;
 import com.Bank.Management.repository.UserRepository;
 import com.Bank.Management.service.BankAccountService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,18 +28,27 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccountResponseDto createAccount(BankAccountRequestDto bankAccountRequestDto) {
+        // Busca al usuario por su ID.
         User user = userRepository.findById(bankAccountRequestDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
 
-        BankAccount newAccount = bankAccountMapper.toBankAccount(bankAccountRequestDto);
-        newAccount.setUser(user);
-        newAccount.setAccountNumber(generateAccountNumber());
+        // Mapea el DTO a la entidad.
+        BankAccount bankAccount = bankAccountMapper.toBankAccount(bankAccountRequestDto);
 
-        BankAccount savedAccount = bankAccountRepository.save(newAccount);
+        // Asigna el usuario a la cuenta y genera un número de cuenta único.
+        bankAccount.setUser(user);
+        bankAccount.setAccountNumber(UUID.randomUUID().toString());
+
+        // Guarda la nueva cuenta en la base de datos.
+        BankAccount savedAccount = bankAccountRepository.save(bankAccount);
+
+        // Devuelve el DTO de respuesta.
         return bankAccountMapper.toBankAccountResponseDto(savedAccount);
     }
 
-    private String generateAccountNumber() {
-        return UUID.randomUUID().toString().substring(0, 12).replace("-", "");
+    @Override
+    public List<BankAccountResponseDto> getAllAccounts() {
+        List<BankAccount> accounts = bankAccountRepository.findAll();
+        return bankAccountMapper.toBankAccountResponseDtoList(accounts);
     }
 }

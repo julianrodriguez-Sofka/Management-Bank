@@ -6,14 +6,19 @@ import com.Bank.Management.entity.BankAccount;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface BankAccountMapper {
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "transactions", ignore = true)
+
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "accountNumber", ignore = true)
     @Mapping(target = "balance", source = "initialBalance")
+    @Mapping(target = "transactions", ignore = true)
     BankAccount toBankAccount(BankAccountRequestDto bankAccountRequestDto);
 
     BankAccountResponseDto toBankAccountResponseDto(BankAccount bankAccount);
+
+    List<BankAccountResponseDto> toBankAccountResponseDtoList(List<BankAccount> bankAccountList);
 }
