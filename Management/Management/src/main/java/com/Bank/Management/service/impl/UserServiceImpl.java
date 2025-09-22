@@ -1,5 +1,6 @@
 package com.Bank.Management.service.impl;
 
+import com.Bank.Management.dto.request.UpdateUserDTO;
 import com.Bank.Management.dto.request.UserRegistrationDto;
 import com.Bank.Management.dto.response.UserResponseDto;
 import com.Bank.Management.entity.User;
@@ -21,14 +22,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(UserRegistrationDto userRegistrationDto) {
+    public UserResponseDto registerUser(UserRegistrationDto userRegistrationDto) {
         if (userRepository.findByUsername(userRegistrationDto.getUsername()).isPresent() ||
                 userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
             throw new RuntimeException("El nombre de usuario o email ya están en uso.");
         }
-
         User user = userMapper.toUser(userRegistrationDto);
-        return userRepository.save(user); // Devuelve la entidad 'User'
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserResponseDto(savedUser);
     }
 
     @Override
@@ -44,5 +45,29 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
         return userMapper.toUserResponseDto(user);
+    }
+
+    @Override
+    public UserResponseDto update(UpdateUserDTO updateUserDTO) {
+        // Busca al usuario por su ID y lanza una excepción si no se encuentra.
+        User userToUpdate = userRepository.findById(updateUserDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + updateUserDTO.getId()));
+
+        // Usa el mapper para actualizar los campos de la entidad con los datos del DTO.
+        userMapper.updateUserFromDto(updateUserDTO, userToUpdate);
+
+        // Guarda y devuelve el usuario actualizado.
+        User updatedUser = userRepository.save(userToUpdate);
+        return userMapper.toUserResponseDto(updatedUser);
+    }
+
+    @Override
+    public void delete(Long id) {
+        // Verifica si el usuario existe antes de intentar eliminarlo.
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Usuario no encontrado con ID: " + id + ". La eliminación no fue posible.");
+        }
     }
 }
