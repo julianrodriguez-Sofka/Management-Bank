@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BankAccountRequestDto {
+public class UpdateBankAccountDto {
 
+    private Long id;
     private double balance;
-    private Long userId;
 }
