@@ -1,10 +1,11 @@
 package com.Bank.Management.controller;
 
+import com.Bank.Management.dto.request.UpdateUserDTO;
 import com.Bank.Management.dto.request.UserRegistrationDto;
 import com.Bank.Management.dto.response.UserResponseDto;
-import com.Bank.Management.entity.User;
-import com.Bank.Management.mapper.UserMapper; // Asegúrate de tener esta importación
 import com.Bank.Management.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,26 +13,47 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "Usuarios", description = "Operaciones relacionadas con usuarios")
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper; // Declara la variable para el mapper
 
-    public UserController(UserService userService, UserMapper userMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userMapper = userMapper;
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar un nuevo usuario")
     public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
-        User registeredUser = userService.registerUser(userRegistrationDto);
-        UserResponseDto responseDto = userMapper.toUserResponseDto(registeredUser);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        UserResponseDto registeredUser = userService.registerUser(userRegistrationDto);
+        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
     @GetMapping
+    @Operation(summary = "Obtener todos los usuarios")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        List<UserResponseDto> users = userService.findAllUsers();
+        List<UserResponseDto> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener un usuario por ID")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+        UserResponseDto user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "Actualizar un usuario")
+    public ResponseEntity<UserResponseDto> updateUser(@RequestBody UpdateUserDTO updateUserDTO) {
+        UserResponseDto updatedUser = userService.update(updateUserDTO);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar un usuario por ID")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -2,5 +2,7 @@ package com.Bank.Management.entity;
 
 public enum TransactionType {
     DEPOSIT,
-    WITHDRAWAL
+    WITHDRAW,
+    TRANSFER_OUT,
+    TRANSFER_IN
 }

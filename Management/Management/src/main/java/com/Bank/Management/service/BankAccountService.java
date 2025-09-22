@@ -1,11 +1,19 @@
 package com.Bank.Management.service;
 
-import com.Bank.Management.entity.BankAccount;
-import java.math.BigDecimal;
+import com.Bank.Management.dto.request.BankAccountRequestDto;
+import com.Bank.Management.dto.request.UpdateBankAccountDto;
+import com.Bank.Management.dto.response.BankAccountResponseDto;
+import java.util.List;
 
 public interface BankAccountService {
-    BankAccount createAccount(Long userId, BigDecimal initialBalance);
-    BankAccount deposit(Long accountId, BigDecimal amount);
-    BankAccount withdraw(Long accountId, BigDecimal amount);
-    BigDecimal getBalance(Long accountId);
+
+    BankAccountResponseDto createAccount(BankAccountRequestDto bankAccountRequestDto);
+
+    List<BankAccountResponseDto> getAllAccounts();
+
+    BankAccountResponseDto getAccountById(Long id);
+
+    BankAccountResponseDto updateAccount(UpdateBankAccountDto updateBankAccountDto);
+
+    void deleteAccount(Long id);
 }
