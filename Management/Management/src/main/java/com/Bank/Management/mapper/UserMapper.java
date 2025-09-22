@@ -5,16 +5,16 @@ import com.Bank.Management.dto.response.UserResponseDto;
 import com.Bank.Management.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "accounts", ignore = true)
+    @Mapping(target = "bankAccounts", ignore = true)
     User toUser(UserRegistrationDto userRegistrationDto);
 
     UserResponseDto toUserResponseDto(User user);
+
+    List<UserResponseDto> toUserResponseDtoList(List<User> userList);
 }
