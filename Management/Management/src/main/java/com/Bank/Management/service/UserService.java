@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserService {
 
-    // save, update, delete, getById, getAll
+
     UserResponseDto registerUser(UserRegistrationDto userRegistrationDto);
 
     List<UserResponseDto> getAllUsers();

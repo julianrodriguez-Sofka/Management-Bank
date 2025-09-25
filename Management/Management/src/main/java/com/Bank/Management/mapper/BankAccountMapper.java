@@ -10,11 +10,15 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {TransactionMapper.class})
 public interface BankAccountMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "accountNumber", ignore = true)
+    @Mapping(target = "outgoingTransactions", ignore = true)
+    @Mapping(target = "incomingTransactions", ignore = true)
+    @Mapping(target = "balance", source = "dto.balance")
     BankAccount toBankAccount(BankAccountRequestDto dto);
 
     BankAccountResponseDto toBankAccountResponseDto(BankAccount entity);
@@ -23,5 +27,8 @@ public interface BankAccountMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "accountNumber", ignore = true)
+    @Mapping(target = "outgoingTransactions", ignore = true)
+    @Mapping(target = "incomingTransactions", ignore = true)
     void updateBankAccountFromDto(UpdateBankAccountDto dto, @MappingTarget BankAccount entity);
 }

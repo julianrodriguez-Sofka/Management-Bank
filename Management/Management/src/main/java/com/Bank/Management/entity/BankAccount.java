@@ -6,12 +6,15 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+import java.util.ArrayList;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "bank_accounts")
+@Table(name = "BANK_ACCOUNTS")
 public class BankAccount {
 
     @Id
@@ -27,4 +30,12 @@ public class BankAccount {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+
+    @OneToMany(mappedBy = "sourceAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> outgoingTransactions = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "targetAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> incomingTransactions = new ArrayList<>();
 }

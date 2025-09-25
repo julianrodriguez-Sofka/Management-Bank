@@ -8,8 +8,9 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DepositRequestDto {
+public class TransferRequestDto {
 
-    private String accountNumber;
+    private String sourceAccountNumber;
+    private String destinationAccountNumber;
     private BigDecimal amount;
 }

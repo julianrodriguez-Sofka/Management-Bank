@@ -9,11 +9,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
-@Tag(name = "Cuentas Bancarias", description = "Operaciones relacionadas con cuentas bancarias")
+@Tag(name = "Cuentas Bancarias", description = "Operaciones CRUD sobre cuentas bancarias")
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
@@ -23,7 +24,7 @@ public class BankAccountController {
     }
 
     @PostMapping
-    @Operation(summary = "Crear una nueva cuenta bancaria")
+    @Operation(summary = "Crear una nueva cuenta bancaria para un usuario")
     public ResponseEntity<BankAccountResponseDto> createAccount(@RequestBody BankAccountRequestDto bankAccountRequestDto) {
         BankAccountResponseDto newAccount = bankAccountService.createAccount(bankAccountRequestDto);
         return new ResponseEntity<>(newAccount, HttpStatus.CREATED);
@@ -44,7 +45,7 @@ public class BankAccountController {
     }
 
     @PutMapping
-    @Operation(summary = "Actualizar una cuenta bancaria")
+    @Operation(summary = "Actualizar el balance o tipo de una cuenta bancaria")
     public ResponseEntity<BankAccountResponseDto> updateAccount(@RequestBody UpdateBankAccountDto updateBankAccountDto) {
         BankAccountResponseDto updatedAccount = bankAccountService.updateAccount(updateBankAccountDto);
         return new ResponseEntity<>(updatedAccount, HttpStatus.OK);

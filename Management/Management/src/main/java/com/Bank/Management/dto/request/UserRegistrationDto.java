@@ -1,15 +1,10 @@
 package com.Bank.Management.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class UserRegistrationDto {
+
     private String username;
     private String email;
     private String password;
