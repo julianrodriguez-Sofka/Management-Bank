@@ -2,6 +2,7 @@ package com.Bank.Management.controller;
 
 import com.Bank.Management.dto.request.BankAccountRequestDto;
 import com.Bank.Management.dto.request.UpdateBankAccountDto;
+import com.Bank.Management.dto.request.AccountOperationDto;
 import com.Bank.Management.dto.response.BankAccountResponseDto;
 import com.Bank.Management.service.BankAccountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
-@Tag(name = "Cuentas Bancarias", description = "Operaciones CRUD sobre cuentas bancarias")
+@Tag(name = "Cuentas Bancarias", description = "Operaciones CRUD y movimientos de saldo")
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
@@ -56,5 +57,19 @@ public class BankAccountController {
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
         bankAccountService.deleteAccount(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/deposit")
+    @Operation(summary = "Realizar un depósito en una cuenta específica (Añadir fondos)")
+    public ResponseEntity<BankAccountResponseDto> deposit(@RequestBody AccountOperationDto operationDto) {
+        BankAccountResponseDto updatedAccount = bankAccountService.deposit(operationDto);
+        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+    }
+
+    @PutMapping("/withdraw")
+    @Operation(summary = "Realizar un retiro de una cuenta específica (Retirar fondos)")
+    public ResponseEntity<BankAccountResponseDto> withdraw(@RequestBody AccountOperationDto operationDto) {
+        BankAccountResponseDto updatedAccount = bankAccountService.withdraw(operationDto);
+        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
     }
 }

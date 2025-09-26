@@ -33,38 +33,49 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponseDto transfer(TransferRequestDto dto) {
 
+        // 1. Validaciones iniciales
+        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            // Usamos IllegalArgumentException para validaciones de entrada de datos
+            throw new IllegalArgumentException("El monto a transferir debe ser positivo.");
+        }
+
+        // Asumiendo que getDestinationAccountNumber() es el método correcto en tu DTO
+        if (dto.getSourceAccountNumber().equals(dto.getDestinationAccountNumber())) {
+            throw new IllegalArgumentException("La cuenta de origen y destino no pueden ser la misma.");
+        }
+
+        // 2. Obtener y validar existencia de cuentas
         BankAccount sourceAccount = bankAccountRepository.findByAccountNumber(dto.getSourceAccountNumber())
                 .orElseThrow(() -> new RuntimeException("Cuenta de origen no encontrada: " + dto.getSourceAccountNumber()));
 
+        // MANTENEMOS la llamada a getDestinationAccountNumber() para que compile
         BankAccount targetAccount = bankAccountRepository.findByAccountNumber(dto.getDestinationAccountNumber())
                 .orElseThrow(() -> new RuntimeException("Cuenta de destino no encontrada: " + dto.getDestinationAccountNumber()));
 
-        if (sourceAccount.getId().equals(targetAccount.getId())) {
-            throw new RuntimeException("La cuenta de origen y destino no pueden ser la misma.");
-        }
-
-        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("El monto a transferir debe ser positivo.");
-        }
-
+        // 3. Validar saldo
         BigDecimal sourceBalance = BigDecimal.valueOf(sourceAccount.getBalance());
 
         if (sourceBalance.compareTo(dto.getAmount()) < 0) {
-            throw new RuntimeException("Saldo insuficiente en la cuenta de origen.");
+            throw new RuntimeException("Saldo insuficiente en la cuenta de origen. Saldo actual: " + sourceAccount.getBalance());
         }
 
+        // 4. Realizar transferencia y actualizar saldos
         sourceAccount.setBalance(sourceBalance.subtract(dto.getAmount()).doubleValue());
 
         BigDecimal targetBalance = BigDecimal.valueOf(targetAccount.getBalance());
         targetAccount.setBalance(targetBalance.add(dto.getAmount()).doubleValue());
 
+        // La persistencia de saldos se mantiene transaccional
         bankAccountRepository.save(sourceAccount);
         bankAccountRepository.save(targetAccount);
 
-        // Crear Registro de Transacción
+        // 5. Crear Registro de Transacción
         Transaction transaction = new Transaction();
         transaction.setAmount(dto.getAmount().doubleValue());
+
+        // MANTENEMOS la llamada a getDestinationAccountNumber()
         transaction.setDescription("Transferencia de " + dto.getSourceAccountNumber() + " a " + dto.getDestinationAccountNumber());
+
         transaction.setTransactionDate(LocalDateTime.now());
         transaction.setSourceAccount(sourceAccount);
         transaction.setTargetAccount(targetAccount);
@@ -92,6 +103,7 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> outgoing = account.getOutgoingTransactions();
         List<Transaction> incoming = account.getIncomingTransactions();
 
+        // Combina y mapea el historial de entrada y salida
         return Stream.concat(outgoing.stream(), incoming.stream())
                 .map(transactionMapper::toTransactionResponseDto)
                 .toList();

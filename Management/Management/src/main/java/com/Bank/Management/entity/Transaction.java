@@ -31,11 +31,11 @@ public class Transaction {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_account_id", nullable = false)
+    @JoinColumn(name = "source_account_id") // CORREGIDO: Se eliminó nullable = false
     private BankAccount sourceAccount;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_account_id", nullable = false)
+    @JoinColumn(name = "target_account_id") // CORREGIDO: Se eliminó nullable = false
     private BankAccount targetAccount;
 }
