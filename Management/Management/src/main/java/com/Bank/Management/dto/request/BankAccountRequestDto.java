@@ -1,7 +1,7 @@
 package com.Bank.Management.dto.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Data; // Incluye @Getter y @Setter
 import lombok.NoArgsConstructor;
 
 @Data

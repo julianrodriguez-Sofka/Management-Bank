@@ -1,7 +1,7 @@
 package com.Bank.Management.service.impl;
 
-import com.Bank.Management.dto.request.UpdateUserDTO;
 import com.Bank.Management.dto.request.UserRegistrationDto;
+import com.Bank.Management.dto.request.UpdateUserDTO;
 import com.Bank.Management.dto.response.UserResponseDto;
 import com.Bank.Management.entity.User;
 import com.Bank.Management.mapper.UserMapper;
@@ -23,21 +23,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto registerUser(UserRegistrationDto userRegistrationDto) {
-        if (userRepository.findByUsername(userRegistrationDto.getUsername()).isPresent() ||
-                userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
-            throw new RuntimeException("El nombre de usuario o email ya están en uso.");
+        if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
+            throw new RuntimeException("El correo electrónico ya está registrado.");
         }
+
         User user = userMapper.toUser(userRegistrationDto);
+
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(savedUser);
     }
 
     @Override
     public List<UserResponseDto> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(userMapper::toUserResponseDto)
-                .toList();
+        List<User> users = userRepository.findAll();
+        return userMapper.toUserResponseDtoList(users);
     }
 
     @Override
@@ -49,25 +48,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto update(UpdateUserDTO updateUserDTO) {
-        // Busca al usuario por su ID y lanza una excepción si no se encuentra.
         User userToUpdate = userRepository.findById(updateUserDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + updateUserDTO.getId()));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado para actualizar con ID: " + updateUserDTO.getId()));
 
-        // Usa el mapper para actualizar los campos de la entidad con los datos del DTO.
         userMapper.updateUserFromDto(updateUserDTO, userToUpdate);
 
-        // Guarda y devuelve el usuario actualizado.
         User updatedUser = userRepository.save(userToUpdate);
         return userMapper.toUserResponseDto(updatedUser);
     }
 
     @Override
     public void delete(Long id) {
-        // Verifica si el usuario existe antes de intentar eliminarlo.
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-        } else {
+        if (!userRepository.existsById(id)) {
             throw new RuntimeException("Usuario no encontrado con ID: " + id + ". La eliminación no fue posible.");
         }
+        userRepository.deleteById(id);
     }
 }

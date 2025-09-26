@@ -60,7 +60,9 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount accountToUpdate = bankAccountRepository.findById(updateBankAccountDto.getId())
                 .orElseThrow(() -> new RuntimeException("Cuenta bancaria no encontrada con ID: " + updateBankAccountDto.getId()));
 
+        // CORRECCIÓN APLICADA: Nombre del método es 'updateBankAccountFromDto'
         bankAccountMapper.updateBankAccountFromDto(updateBankAccountDto, accountToUpdate);
+
         BankAccount updatedAccount = bankAccountRepository.save(accountToUpdate);
         return bankAccountMapper.toBankAccountResponseDto(updatedAccount);
     }
@@ -73,13 +75,11 @@ public class BankAccountServiceImpl implements BankAccountService {
         bankAccountRepository.deleteById(id);
     }
 
-    // Método privado para generar un número de cuenta numérico
     private String generateRandomAccountNumber() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
-        // Genera un número de 12 dígitos
         for (int i = 0; i < 12; i++) {
-            sb.append(random.nextInt(10)); // Añade un dígito aleatorio del 0 al 9
+            sb.append(random.nextInt(10));
         }
         return sb.toString();
     }

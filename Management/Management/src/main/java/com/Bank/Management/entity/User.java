@@ -1,6 +1,7 @@
 package com.Bank.Management.entity;
 
 import jakarta.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import lombok.AllArgsConstructor;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -29,5 +30,5 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BankAccount> bankAccounts;
+    private Set<BankAccount> bankAccounts = new HashSet<>();
 }
