@@ -1,20 +1,23 @@
 package com.Bank.Management.service.impl;
 
+
+import com.Bank.Management.exception.DataNotFoundException;
+import com.Bank.Management.exception.InsufficientFundsException;
+import com.Bank.Management.exception.InvalidOperationException;
 import com.Bank.Management.dto.request.TransferRequestDto;
 import com.Bank.Management.dto.response.TransactionResponseDto;
 import com.Bank.Management.entity.BankAccount;
 import com.Bank.Management.entity.Transaction;
-import com.Bank.Management.mapper.TransactionMapper;
 import com.Bank.Management.repository.BankAccountRepository;
 import com.Bank.Management.repository.TransactionRepository;
+import com.Bank.Management.mapper.TransactionMapper;
 import com.Bank.Management.service.TransactionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -32,28 +35,28 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public TransactionResponseDto transfer(TransferRequestDto dto) {
+        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidOperationException("El monto a transferir debe ser positivo.");
+        }
+
+        if (dto.getSourceAccountNumber().equals(dto.getDestinationAccountNumber())) {
+            throw new InvalidOperationException("La cuenta de origen y destino no pueden ser la misma.");
+        }
 
         BankAccount sourceAccount = bankAccountRepository.findByAccountNumber(dto.getSourceAccountNumber())
-                .orElseThrow(() -> new RuntimeException("Cuenta de origen no encontrada: " + dto.getSourceAccountNumber()));
+                .orElseThrow(() -> new DataNotFoundException(dto.getSourceAccountNumber(), "Cuenta de origen"));
 
         BankAccount targetAccount = bankAccountRepository.findByAccountNumber(dto.getDestinationAccountNumber())
-                .orElseThrow(() -> new RuntimeException("Cuenta de destino no encontrada: " + dto.getDestinationAccountNumber()));
-
-        if (sourceAccount.getId().equals(targetAccount.getId())) {
-            throw new RuntimeException("La cuenta de origen y destino no pueden ser la misma.");
-        }
-
-        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("El monto a transferir debe ser positivo.");
-        }
+                .orElseThrow(() -> new DataNotFoundException(dto.getDestinationAccountNumber(), "Cuenta de destino"));
 
         BigDecimal sourceBalance = BigDecimal.valueOf(sourceAccount.getBalance());
 
         if (sourceBalance.compareTo(dto.getAmount()) < 0) {
-            throw new RuntimeException("Saldo insuficiente en la cuenta de origen.");
+            throw new InsufficientFundsException("Saldo insuficiente en la cuenta de origen.");
         }
 
         sourceAccount.setBalance(sourceBalance.subtract(dto.getAmount()).doubleValue());
+
 
         BigDecimal targetBalance = BigDecimal.valueOf(targetAccount.getBalance());
         targetAccount.setBalance(targetBalance.add(dto.getAmount()).doubleValue());
@@ -61,10 +64,11 @@ public class TransactionServiceImpl implements TransactionService {
         bankAccountRepository.save(sourceAccount);
         bankAccountRepository.save(targetAccount);
 
-        // Crear Registro de Transacción
         Transaction transaction = new Transaction();
         transaction.setAmount(dto.getAmount().doubleValue());
+
         transaction.setDescription("Transferencia de " + dto.getSourceAccountNumber() + " a " + dto.getDestinationAccountNumber());
+
         transaction.setTransactionDate(LocalDateTime.now());
         transaction.setSourceAccount(sourceAccount);
         transaction.setTargetAccount(targetAccount);
@@ -78,7 +82,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public TransactionResponseDto getTransactionById(Long id) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transacción no encontrada con ID: " + id));
+                .orElseThrow(() -> new DataNotFoundException(id, "Transacción"));
 
         return transactionMapper.toTransactionResponseDto(transaction);
     }
@@ -87,7 +91,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public List<TransactionResponseDto> getHistoryByAccountNumber(String accountNumber) {
         BankAccount account = bankAccountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new RuntimeException("Cuenta bancaria no encontrada con número: " + accountNumber));
+                .orElseThrow(() -> new DataNotFoundException(accountNumber, "Cuenta Bancaria"));
+
 
         List<Transaction> outgoing = account.getOutgoingTransactions();
         List<Transaction> incoming = account.getIncomingTransactions();

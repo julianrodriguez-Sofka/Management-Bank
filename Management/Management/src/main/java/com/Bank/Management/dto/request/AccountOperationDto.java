@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DepositRequestDto {
+public class AccountOperationDto {
 
     private String accountNumber;
     private BigDecimal amount;

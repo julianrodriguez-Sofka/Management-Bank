@@ -9,12 +9,8 @@ public interface UserService {
 
 
     UserResponseDto registerUser(UserRegistrationDto userRegistrationDto);
-
     List<UserResponseDto> getAllUsers();
-
     UserResponseDto getUserById(Long id);
-
     UserResponseDto update(UpdateUserDTO updateUserDTO);
-
     void delete(Long id);
 }
