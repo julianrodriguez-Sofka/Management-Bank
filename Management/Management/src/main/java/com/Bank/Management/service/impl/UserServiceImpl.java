@@ -1,5 +1,8 @@
 package com.Bank.Management.service.impl;
 
+
+import com.Bank.Management.exception.DataNotFoundException;
+import com.Bank.Management.exception.DuplicatedDataException;
 import com.Bank.Management.dto.request.UserRegistrationDto;
 import com.Bank.Management.dto.request.UpdateUserDTO;
 import com.Bank.Management.dto.response.UserResponseDto;
@@ -24,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto registerUser(UserRegistrationDto userRegistrationDto) {
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
-            throw new RuntimeException("El correo electrónico ya está registrado.");
+            throw new DuplicatedDataException("Usuario (email)", userRegistrationDto.getEmail());
         }
 
         User user = userMapper.toUser(userRegistrationDto);
@@ -42,14 +45,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new DataNotFoundException(id, "Usuario"));
         return userMapper.toUserResponseDto(user);
     }
 
     @Override
     public UserResponseDto update(UpdateUserDTO updateUserDTO) {
         User userToUpdate = userRepository.findById(updateUserDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado para actualizar con ID: " + updateUserDTO.getId()));
+                .orElseThrow(() -> new DataNotFoundException(updateUserDTO.getId(), "Usuario para actualizar"));
 
         userMapper.updateUserFromDto(updateUserDTO, userToUpdate);
 
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id + ". La eliminación no fue posible.");
+            throw new DataNotFoundException(id, "Usuario");
         }
         userRepository.deleteById(id);
     }

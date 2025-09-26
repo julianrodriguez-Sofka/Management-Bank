@@ -170,3 +170,95 @@ The object is already closed [90007-224]
 2025-09-26 15:29:59.924344-05:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
 The object is already closed [90007-224]
+2025-09-26 16:18:12.657960-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:29:04.645557-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:30:38.729742-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:34:50.965032-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:35:50.656441-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:39:29.680588-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "-- 3. Eliminar la tabla de Usuarios (la tabla base)\000d\000aDROP TABLE IF EXISTS [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "-- 3. Eliminar la tabla de Usuarios (la tabla base)\000d\000aDROP TABLE IF EXISTS [*]USER"; expected "identifier"; SQL statement:
+-- 3. Eliminar la tabla de Usuarios (la tabla base)
+DROP TABLE IF EXISTS USER [42001-224]
+2025-09-26 16:39:40.214821-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "-- 3. Eliminar la tabla de Usuarios (la tabla base)\000d\000aDROP TABLE IF EXISTS [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "-- 3. Eliminar la tabla de Usuarios (la tabla base)\000d\000aDROP TABLE IF EXISTS [*]USER"; expected "identifier"; SQL statement:
+-- 3. Eliminar la tabla de Usuarios (la tabla base)
+DROP TABLE IF EXISTS USER [42001-224]
+2025-09-26 16:39:46.380351-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "-- 3. Eliminar la tabla de Usuarios (la tabla base)\000d\000aDROP TABLE IF EXISTS [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "-- 3. Eliminar la tabla de Usuarios (la tabla base)\000d\000aDROP TABLE IF EXISTS [*]USER"; expected "identifier"; SQL statement:
+-- 3. Eliminar la tabla de Usuarios (la tabla base)
+DROP TABLE IF EXISTS USER [42001-224]
+2025-09-26 16:39:58.744986-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE IF EXISTS [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "DROP TABLE IF EXISTS [*]USER"; expected "identifier"; SQL statement:
+DROP TABLE IF EXISTS USER [42001-224]
+2025-09-26 16:40:12.672764-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "BANK_ACCOUNT" no encontrada
+Table "BANK_ACCOUNT" not found; SQL statement:
+DROP TABLE BANK_ACCOUNT [42102-224]
+2025-09-26 16:40:12.672764-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE IF EXISTS [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "DROP TABLE IF EXISTS [*]USER"; expected "identifier"; SQL statement:
+DROP TABLE IF EXISTS USER [42001-224]
+2025-09-26 16:40:13.135716-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "BANK_ACCOUNT" no encontrada
+Table "BANK_ACCOUNT" not found; SQL statement:
+DROP TABLE BANK_ACCOUNT [42102-224]
+2025-09-26 16:40:13.138232-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE IF EXISTS [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "DROP TABLE IF EXISTS [*]USER"; expected "identifier"; SQL statement:
+DROP TABLE IF EXISTS USER [42001-224]
+2025-09-26 16:40:20.641277-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "BANK_ACCOUNT" no encontrada
+Table "BANK_ACCOUNT" not found; SQL statement:
+DROP TABLE BANK_ACCOUNT [42102-224]
+2025-09-26 16:40:20.642652-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "DROP TABLE [*]USER"; expected "identifier"; SQL statement:
+DROP TABLE USER [42001-224]
+2025-09-26 16:40:38.372354-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE BANK_ACCOUNTS\000d\000a\000d\000a[*]DROP TABLE USERS"
+Syntax error in SQL statement "DROP TABLE BANK_ACCOUNTS\000d\000a\000d\000a[*]DROP TABLE USERS"; SQL statement:
+DROP TABLE BANK_ACCOUNTS
+
+DROP TABLE USERS [42000-224]
+2025-09-26 16:40:40.637547-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE BANK_ACCOUNTS\000d\000a\000d\000a[*]DROP TABLE USERS"
+Syntax error in SQL statement "DROP TABLE BANK_ACCOUNTS\000d\000a\000d\000a[*]DROP TABLE USERS"; SQL statement:
+DROP TABLE BANK_ACCOUNTS
+
+DROP TABLE USERS [42000-224]
+2025-09-26 16:42:08.780767-05:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "DROP TABLE [*]USER"; se esperaba "identifier"
+Syntax error in SQL statement "DROP TABLE [*]USER"; expected "identifier"; SQL statement:
+DROP TABLE USER [42001-224]
+2025-09-26 16:43:22.477879-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:43:46.578665-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:44:08.627157-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:44:31.671382-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:44:41.829878-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]
+2025-09-26 16:44:50.393694-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: El objeto ya está cerrado
+The object is already closed [90007-224]

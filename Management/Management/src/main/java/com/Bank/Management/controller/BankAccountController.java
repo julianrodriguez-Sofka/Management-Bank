@@ -46,7 +46,7 @@ public class BankAccountController {
     }
 
     @PutMapping
-    @Operation(summary = "Actualizar el balance o tipo de una cuenta bancaria")
+    @Operation(summary = "Actualizar el balance de una cuenta bancaria")
     public ResponseEntity<BankAccountResponseDto> updateAccount(@RequestBody UpdateBankAccountDto updateBankAccountDto) {
         BankAccountResponseDto updatedAccount = bankAccountService.updateAccount(updateBankAccountDto);
         return new ResponseEntity<>(updatedAccount, HttpStatus.OK);

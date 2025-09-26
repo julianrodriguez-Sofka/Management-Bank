@@ -15,7 +15,7 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "bankAccounts", ignore = true) // Correcto al CREAR un usuario
+    @Mapping(target = "bankAccounts", ignore = true)
     User toUser(UserRegistrationDto userRegistrationDto);
 
     UserResponseDto toUserResponseDto(User user);
@@ -23,6 +23,6 @@ public interface UserMapper {
     List<UserResponseDto> toUserResponseDtoList(List<User> userList);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "bankAccounts", ignore = true) // Correcto al ACTUALIZAR
+    @Mapping(target = "bankAccounts", ignore = true)
     void updateUserFromDto(UpdateUserDTO dto, @MappingTarget User user);
 }

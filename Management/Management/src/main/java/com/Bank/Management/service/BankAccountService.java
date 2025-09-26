@@ -11,16 +11,10 @@ public interface BankAccountService {
 
 
     BankAccountResponseDto createAccount(BankAccountRequestDto bankAccountRequestDto);
-
     List<BankAccountResponseDto> getAllAccounts();
-
     BankAccountResponseDto getAccountById(Long id);
-
     BankAccountResponseDto updateAccount(UpdateBankAccountDto updateBankAccountDto);
-
     void deleteAccount(Long id);
-
     BankAccountResponseDto deposit(AccountOperationDto operationDto);
-
     BankAccountResponseDto withdraw(AccountOperationDto operationDto);
 }
