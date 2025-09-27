@@ -1,13 +1,15 @@
 package com.Bank.Management.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
+
 public class TransactionResponseDto {
 
     private Long id;
