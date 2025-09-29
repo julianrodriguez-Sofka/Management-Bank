@@ -96,7 +96,7 @@ class TransactionServiceImplTest {
         when(transactionRepository.save(any(Transaction.class))).thenReturn(testTransaction);
         when(transactionMapper.toTransactionResponseDto(any(Transaction.class))).thenReturn(responseDto);
 
-        // 3. Llamar al método a probar
+        // 3. Llamar al metodo a probar
         var result = transactionService.transfer(transferDto);
 
         // 4. Verificar los resultados
@@ -125,7 +125,7 @@ class TransactionServiceImplTest {
         when(bankAccountRepository.findByAccountNumber(SOURCE_NUM)).thenReturn(Optional.of(sourceAccount));
         when(bankAccountRepository.findByAccountNumber(TARGET_NUM)).thenReturn(Optional.of(targetAccount));
 
-        // 3. Llamar al método y esperar la excepción
+        // 3. Llamar al metodo y esperar la excepción
         assertThrows(InsufficientFundsException.class, () -> transactionService.transfer(transferDto));
 
         // 5. Verificar interacciones
@@ -175,7 +175,7 @@ class TransactionServiceImplTest {
         when(bankAccountRepository.findByAccountNumber(SOURCE_NUM)).thenReturn(Optional.of(sourceAccount));
         when(bankAccountRepository.findByAccountNumber(TARGET_NUM)).thenReturn(Optional.empty());
 
-        // 3. Llamar al método y esperar la excepción
+        // 3. Llamar al metodo y esperar la excepción
         assertThrows(DataNotFoundException.class, () -> transactionService.transfer(transferDto));
 
         // 5. Verificar interacciones
