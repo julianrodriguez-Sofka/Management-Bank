@@ -1,12 +1,12 @@
 package com.Bank.Management.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class BankAccountRequestDto {
 
     private double balance;

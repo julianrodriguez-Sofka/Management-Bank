@@ -13,7 +13,6 @@ import com.Bank.Management.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceImplTest {
 
-    @InjectMocks
     private TransactionServiceImpl transactionService;
 
     @Mock
@@ -54,6 +52,9 @@ class TransactionServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        // CAMBIO 2: Inicialización manual del servicio por constructor
+        transactionService = new TransactionServiceImpl(transactionRepository, bankAccountRepository, transactionMapper);
+
         // Inicialización de Cuenta Origen
         sourceAccount = new BankAccount();
         sourceAccount.setId(1L);
@@ -77,16 +78,15 @@ class TransactionServiceImplTest {
         testTransaction.setId(100L);
         testTransaction.setAmount(TRANSFER_AMOUNT.doubleValue());
 
-        // DTO de Respuesta simulado (CORREGIDO: Solo usamos campos existentes)
+        // DTO de Respuesta simulado
         responseDto = new TransactionResponseDto();
         responseDto.setId(100L);
         responseDto.setSourceAccountNumber(SOURCE_NUM);
         responseDto.setTargetAccountNumber(TARGET_NUM);
         responseDto.setAmount(TRANSFER_AMOUNT.doubleValue());
-
     }
 
-  // Objetivo: Transferencia - Caso de Éxito
+    // Objetivo: Transferencia - Caso de Éxito
 
     @Test
     void transfer_Success_UpdatesBalancesAndSavesTransaction() {
@@ -134,6 +134,57 @@ class TransactionServiceImplTest {
         verify(bankAccountRepository, never()).save(any());
         verifyNoInteractions(transactionRepository);
     }
+
+    // Objetivo: Transferencia - Caso de Fallo (Cuentas Iguales)
+
+    @Test
+    void transfer_Fails_ThrowsInvalidOperation_SameAccount() {
+        // 1. Datos de entrada (Origen == Destino)
+        transferDto.setDestinationAccountNumber(SOURCE_NUM);
+
+        // 3. Llamar al metodo y esperar la excepción
+        assertThrows(InvalidOperationException.class, () -> transactionService.transfer(transferDto));
+
+        // 5. Verificar interacciones
+        verify(bankAccountRepository, never()).findByAccountNumber(any());
+        verifyNoInteractions(transactionRepository);
+    }
+
+    // Objetivo: Transferencia - Caso de Fallo (Cuenta de Origen No Encontrada)
+
+    @Test
+    void transfer_Fails_WhenSourceAccountNotFound() {
+        // 2. Establecer comportamientos simulados
+        when(bankAccountRepository.findByAccountNumber(SOURCE_NUM)).thenReturn(Optional.empty());
+
+        // 3. Llamar al metodo y esperar la excepción
+        assertThrows(DataNotFoundException.class, () -> transactionService.transfer(transferDto));
+
+        // 5. Verificar interacciones
+        verify(bankAccountRepository).findByAccountNumber(SOURCE_NUM);
+        verify(bankAccountRepository, never()).findByAccountNumber(TARGET_NUM);
+        verify(bankAccountRepository, never()).save(any());
+        verifyNoInteractions(transactionRepository);
+    }
+
+    // Objetivo: Transferencia - Caso de Fallo (Cuenta de Destino No Encontrada)
+
+    @Test
+    void transfer_Fails_WhenTargetAccountNotFound() {
+        // 2. Establecer comportamientos simulados
+        when(bankAccountRepository.findByAccountNumber(SOURCE_NUM)).thenReturn(Optional.of(sourceAccount));
+        when(bankAccountRepository.findByAccountNumber(TARGET_NUM)).thenReturn(Optional.empty());
+
+        // 3. Llamar al método y esperar la excepción
+        assertThrows(DataNotFoundException.class, () -> transactionService.transfer(transferDto));
+
+        // 5. Verificar interacciones
+        verify(bankAccountRepository).findByAccountNumber(SOURCE_NUM);
+        verify(bankAccountRepository).findByAccountNumber(TARGET_NUM);
+        verify(bankAccountRepository, never()).save(any());
+        verifyNoInteractions(transactionRepository);
+    }
+
 
     @Test
     void getTransactionById() {

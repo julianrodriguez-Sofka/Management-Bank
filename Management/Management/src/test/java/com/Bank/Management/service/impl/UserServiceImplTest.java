@@ -12,7 +12,6 @@ import com.Bank.Management.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
-    @InjectMocks
     private UserServiceImpl userServiceImpl;
 
     @Mock
@@ -44,6 +42,8 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        userServiceImpl = new UserServiceImpl(userRepository, userMapper);
+
         userTest = new User();
         userTest.setId(TEST_ID);
         userTest.setUsername("TestUser");
@@ -68,14 +68,14 @@ class UserServiceImplTest {
     //Objetivo: Registro de Usuario (registerUser) - Caso de Éxito
 
     @Test
-    void registerUser_Success_ReturnsSavedUser() { // Nombre mejorado para reflejar el resultado
+    void registerUser_Success_ReturnsSavedUser() {
         // 2. Establecer comportamientos simulados
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
         when(userMapper.toUser(any(UserRegistrationDto.class))).thenReturn(userTest);
         when(userRepository.save(any(User.class))).thenReturn(userTest);
         when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
 
-        // 3. Llamar al método a probar
+        // 3. Llamar al metodo a probar
         var result = userServiceImpl.registerUser(registerDto);
 
         // 4. Verificar los resultados
@@ -94,11 +94,11 @@ class UserServiceImplTest {
     //Objetivo: Registro de Usuario (registerUser) - Caso de Fallo (Duplicado)
 
     @Test
-    void registerUser_Fails_ThrowsDuplicatedDataException() { // Nombre mejorado para reflejar la excepción
+    void registerUser_Fails_ThrowsDuplicatedDataException() {
         // 2. Establecer comportamientos simulados
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(userTest));
 
-        // 3. Llamar al método y esperar la excepción
+        // 3. Llamar al metodo y esperar la excepción
         assertThrows(DuplicatedDataException.class, () -> userServiceImpl.registerUser(registerDto));
 
         // 5. Verificar interacciones
@@ -130,7 +130,7 @@ class UserServiceImplTest {
     // Objetivo:Obtener Usuario por ID (getUserById) - Caso de Fallo (No encontrado)
 
     @Test
-    void getUserById_Fails_ThrowsDataNotFoundException() { // Nombre mejorado para reflejar la excepción
+    void getUserById_Fails_ThrowsDataNotFoundException() {
         // 2. Establecer comportamientos simulados
         when(userRepository.findById(TEST_ID)).thenReturn(Optional.empty());
 

@@ -1,8 +1,7 @@
 package com.Bank.Management.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.List;
 
 // Importa el DTO que crearemos a continuación
@@ -11,6 +10,8 @@ import com.Bank.Management.dto.response.TransactionResponseDto;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class BankAccountResponseDto {
 
     private Long id;

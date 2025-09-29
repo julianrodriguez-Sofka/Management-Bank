@@ -15,7 +15,6 @@ import com.Bank.Management.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -31,7 +30,6 @@ import static org.mockito.Mockito.*;
 class BankAccountServiceImplTest {
 
 
-    @InjectMocks
     private BankAccountServiceImpl bankAccountService;
 
 
@@ -53,9 +51,18 @@ class BankAccountServiceImplTest {
     private final Long USER_ID = 1L;
     private final String ACCOUNT_NUMBER = "4512345678-01";
     private final double INITIAL_BALANCE = 100.00;
+    private final BigDecimal OPERATION_AMOUNT = BigDecimal.valueOf(50.00); // Añadido para pruebas
 
     @BeforeEach
     void setUp() {
+        // CAMBIO 2: Inicialización manual del servicio por constructor
+        bankAccountService = new BankAccountServiceImpl(
+                bankAccountRepository,
+                userRepository,
+                bankAccountMapper,
+                transactionRepository
+        );
+
         testUser = new User();
         testUser.setId(USER_ID);
 
@@ -76,7 +83,7 @@ class BankAccountServiceImplTest {
         // 1. Datos de entrada con saldo inválido
         BankAccountRequestDto negativeBalanceDto = new BankAccountRequestDto(-50.00, USER_ID);
 
-        // 3. Llamar al método y esperar la excepción (400 Bad Request)
+        // 3. Llamar al metodo y esperar la excepción (400 Bad Request)
         Exception exception = assertThrows(InvalidOperationException.class, () -> {
             bankAccountService.createAccount(negativeBalanceDto);
         });
@@ -111,7 +118,6 @@ class BankAccountServiceImplTest {
     }
 
 
-
     @Test
     void createAccount_SuccessfulPlaceholder() {
 
@@ -127,23 +133,4 @@ class BankAccountServiceImplTest {
 
     }
 
-    @Test
-    void updateAccount() {
-
-    }
-
-    @Test
-    void deleteAccount() {
-
-    }
-
-    @Test
-    void deposit() {
-
-    }
-
-    @Test
-    void withdraw() {
-
-    }
 }
