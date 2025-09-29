@@ -6,6 +6,7 @@ import com.Bank.Management.dto.response.UserResponseDto;
 import com.Bank.Management.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class UserController {
 
     @PostMapping("/register")
     @Operation(summary = "Registrar un nuevo usuario")
-    public ResponseEntity<UserResponseDto> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+    public ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         UserResponseDto registeredUser = userService.registerUser(userRegistrationDto);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
@@ -38,14 +39,14 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener un usuario por ID")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable @Valid Long id) {
         UserResponseDto user = userService.getUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping("/update")
     @Operation(summary = "Actualizar un usuario")
-    public ResponseEntity<UserResponseDto> updateUser(@RequestBody UpdateUserDTO updateUserDTO) {
+    public ResponseEntity<UserResponseDto> updateUser(@Valid @RequestBody UpdateUserDTO updateUserDTO) {
         UserResponseDto updatedUser = userService.update(updateUserDTO);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
