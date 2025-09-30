@@ -52,7 +52,6 @@ class TransactionServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        // CAMBIO 2: Inicialización manual del servicio por constructor
         transactionService = new TransactionServiceImpl(transactionRepository, bankAccountRepository, transactionMapper);
 
         // Inicialización de Cuenta Origen

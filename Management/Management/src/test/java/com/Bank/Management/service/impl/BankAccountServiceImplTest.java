@@ -51,11 +51,10 @@ class BankAccountServiceImplTest {
     private final Long USER_ID = 1L;
     private final String ACCOUNT_NUMBER = "4512345678-01";
     private final double INITIAL_BALANCE = 100.00;
-    private final BigDecimal OPERATION_AMOUNT = BigDecimal.valueOf(50.00); // Añadido para pruebas
+    private final BigDecimal OPERATION_AMOUNT = BigDecimal.valueOf(50.00);
 
     @BeforeEach
     void setUp() {
-        // CAMBIO 2: Inicialización manual del servicio por constructor
         bankAccountService = new BankAccountServiceImpl(
                 bankAccountRepository,
                 userRepository,
@@ -116,6 +115,26 @@ class BankAccountServiceImplTest {
         verify(bankAccountRepository, never()).save(any());
         verifyNoInteractions(transactionRepository);
     }
+// Objetivo: Verificar que una cuenta bancaria se crea correctamente cuando se proporcionan datos válidos.
+    @Test
+    void createAccount_success() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
+        when(bankAccountMapper.toBankAccount(any(BankAccountRequestDto.class))).thenReturn(accountEntity);
+        when(bankAccountRepository.findByAccountNumber(anyString())).thenReturn(Optional.empty());
+        when(bankAccountRepository.save(any(BankAccount.class))).thenReturn(accountEntity);
+
+        when(bankAccountMapper.toBankAccountResponseDto(any(BankAccount.class))).thenReturn(responseDto);
+
+        BankAccountResponseDto result = bankAccountService.createAccount(createDto);
+
+        assertNotNull(result);
+        assertEquals(ACCOUNT_NUMBER, result.getAccountNumber());
+        assertEquals(INITIAL_BALANCE, result.getBalance());
+
+        verify(userRepository).findById(USER_ID);
+        verify(bankAccountRepository, times(1)).save(any(BankAccount.class));
+        verify(bankAccountMapper).toBankAccountResponseDto(any(BankAccount.class));
+    }
 
 
     @Test
@@ -132,5 +151,4 @@ class BankAccountServiceImplTest {
     void getAccountById() {
 
     }
-
 }
