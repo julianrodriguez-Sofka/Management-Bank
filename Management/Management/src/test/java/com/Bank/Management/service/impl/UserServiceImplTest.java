@@ -142,15 +142,79 @@ class UserServiceImplTest {
         verifyNoInteractions(userMapper);
     }
 
+    // Objetivo: Obtener Todos los Usuarios (getAllUsers) - Caso de Éxito
     @Test
-    void getAllUsers() {
+    void getAllUsers_Success_ReturnsListOfUsers() {
+        List<User> userList = List.of(userTest);
+        when(userRepository.findAll()).thenReturn(userList);
+        when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
+        List<UserResponseDto> result = userServiceImpl.getAllUsers();
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(TEST_ID, result.get(0).getId());
+        verify(userRepository).findAll();
+        verify(userMapper, times(userList.size())).toUserResponseDto(any(User.class));
     }
 
+    // Objetivo: Actualizar Usuario (update) - Caso de Éxito
     @Test
-    void update() {
+    void update_Success_ReturnsUpdatedUser() {
+        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, "NewName", "new@bank.com", "NewPassword");
+        User updatedUserEntity = new User();
+        updatedUserEntity.setId(TEST_ID);
+        updatedUserEntity.setUsername("NewName");
+        updatedUserEntity.setEmail("new@bank.com");
+        updatedUserEntity.setPassword("NewPassword");
+
+        when(userRepository.findById(TEST_ID)).thenReturn(Optional.of(userTest));
+        when(userRepository.save(any(User.class))).thenReturn(updatedUserEntity);
+        when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
+
+        UserResponseDto result = userServiceImpl.update(updateDto);
+
+        assertNotNull(result);
+
+        verify(userRepository).findById(TEST_ID);
+        verify(userMapper).updateUserFromDto(updateDto, userTest);
+        verify(userRepository).save(userTest);
+        verify(userMapper).toUserResponseDto(updatedUserEntity);
     }
 
+    // Objetivo: Actualizar Usuario (update) - Caso de Fallo (No encontrado)
     @Test
-    void delete() {
+    void update_Fails_ThrowsDataNotFoundException() {
+        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, "NewName", "new@bank.com", "NewPassword");
+
+        when(userRepository.findById(TEST_ID)).thenReturn(Optional.empty());
+
+        assertThrows(DataNotFoundException.class, () -> userServiceImpl.update(updateDto));
+
+        verify(userRepository).findById(TEST_ID);
+        verify(userRepository, never()).save(any());
+        verifyNoMoreInteractions(userMapper);
+    }
+
+    // Objetivo: Eliminar Usuario (delete) - Caso de Éxito
+    @Test
+    void delete_Success_PerformsDeletion() {
+        when(userRepository.existsById(TEST_ID)).thenReturn(true);
+        doNothing().when(userRepository).deleteById(TEST_ID);
+
+        userServiceImpl.delete(TEST_ID);
+
+        verify(userRepository).existsById(TEST_ID);
+        verify(userRepository).deleteById(TEST_ID);
+    }
+
+    // Objetivo: Eliminar Usuario (delete) - Caso de Fallo (No encontrado)
+    @Test
+    void delete_Fails_ThrowsDataNotFoundException() {
+        when(userRepository.existsById(TEST_ID)).thenReturn(false);
+
+        assertThrows(DataNotFoundException.class, () -> userServiceImpl.delete(TEST_ID));
+
+        verify(userRepository).existsById(TEST_ID);
+        verify(userRepository, never()).deleteById(any());
     }
 }

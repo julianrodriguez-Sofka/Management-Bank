@@ -12,6 +12,7 @@ import com.Bank.Management.repository.UserRepository;
 import com.Bank.Management.service.UserService;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors; // Necesario para el .stream()
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -39,7 +40,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return userMapper.toUserResponseDtoList(users);
+        // CORRECCIÓN: Usamos Streams para llamar al método toUserResponseDto por cada entidad,
+        // lo cual es lo que el test unitario espera que hagas.
+        return users.stream()
+                .map(userMapper::toUserResponseDto)
+                .collect(Collectors.toList());
     }
 
     @Override
