@@ -1,15 +1,18 @@
 package com.Bank.Management.exception;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
+@ResponseStatus(HttpStatus.CONFLICT)
 public class DuplicatedDataException extends RuntimeException {
-    private final String entity;
-    private final String identifier;
+    private final String field;
+    private final String value;
 
-    public DuplicatedDataException(String entity, String identifier) {
-        super(String.format("%s con el identificador '%s' ya existe.", entity, identifier));
-        this.entity = entity;
-        this.identifier = identifier;
+    public DuplicatedDataException(String field, String value) {
+        super(String.format("El %s '%s' ya existe y debe ser único.", field, value));
+        this.field = field;
+        this.value = value;
     }
 }

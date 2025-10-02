@@ -12,7 +12,7 @@ import com.Bank.Management.repository.UserRepository;
 import com.Bank.Management.service.UserService;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors; // Necesario para el .stream()
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,8 +27,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto registerUser(UserRegistrationDto userRegistrationDto) {
+        if (userRepository.existsByDni(userRegistrationDto.getDni())) {
+            throw new DuplicatedDataException("DNI", userRegistrationDto.getDni());
+        }
+
         if (userRepository.findByEmail(userRegistrationDto.getEmail()).isPresent()) {
-            throw new DuplicatedDataException("Usuario (email)", userRegistrationDto.getEmail());
+            throw new DuplicatedDataException("Email", userRegistrationDto.getEmail());
         }
 
         User user = userMapper.toUser(userRegistrationDto);
@@ -40,8 +44,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        // CORRECCIÓN: Usamos Streams para llamar al método toUserResponseDto por cada entidad,
-        // lo cual es lo que el test unitario espera que hagas.
         return users.stream()
                 .map(userMapper::toUserResponseDto)
                 .collect(Collectors.toList());

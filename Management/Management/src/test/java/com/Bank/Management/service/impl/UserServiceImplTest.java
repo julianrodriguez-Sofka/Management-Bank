@@ -39,6 +39,7 @@ class UserServiceImplTest {
     private UserResponseDto responseDto;
     private final String TEST_EMAIL = "test@bank.com";
     private final Long TEST_ID = 1L;
+    private final String TEST_DNI = "12345678X";
 
     @BeforeEach
     void setUp() {
@@ -51,6 +52,7 @@ class UserServiceImplTest {
         userTest.setPassword("hashed_password");
 
         registerDto = new UserRegistrationDto(
+                TEST_DNI,
                 "TestUser",
                 TEST_EMAIL,
                 "securePwd123"
@@ -58,6 +60,7 @@ class UserServiceImplTest {
 
         responseDto = new UserResponseDto(
                 TEST_ID,
+                TEST_DNI,
                 "TestUser",
                 TEST_EMAIL,
                 "CUSTOMER",
@@ -69,40 +72,51 @@ class UserServiceImplTest {
 
     @Test
     void registerUser_Success_ReturnsSavedUser() {
-        // 2. Establecer comportamientos simulados
+        when(userRepository.existsByDni(registerDto.getDni())).thenReturn(false);
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
         when(userMapper.toUser(any(UserRegistrationDto.class))).thenReturn(userTest);
         when(userRepository.save(any(User.class))).thenReturn(userTest);
         when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
 
-        // 3. Llamar al metodo a probar
         var result = userServiceImpl.registerUser(registerDto);
 
-        // 4. Verificar los resultados
         assertAll("User registration successful",
                 () -> assertInstanceOf(UserResponseDto.class, result),
                 () -> assertEquals(TEST_ID, result.getId())
         );
 
-        // 5. Verificar interacciones
+        verify(userRepository).existsByDni(registerDto.getDni());
         verify(userRepository).findByEmail(TEST_EMAIL);
         verify(userRepository).save(userTest);
         verify(userMapper).toUser(registerDto);
     }
 
 
-    //Objetivo: Registro de Usuario (registerUser) - Caso de Fallo (Duplicado)
+    //Objetivo: Registro de Usuario (registerUser) - Caso de Fallo (Duplicado Email)
 
     @Test
     void registerUser_Fails_ThrowsDuplicatedDataException() {
-        // 2. Establecer comportamientos simulados
+        when(userRepository.existsByDni(registerDto.getDni())).thenReturn(false);
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(userTest));
 
-        // 3. Llamar al metodo y esperar la excepción
         assertThrows(DuplicatedDataException.class, () -> userServiceImpl.registerUser(registerDto));
 
-        // 5. Verificar interacciones
+        verify(userRepository).existsByDni(registerDto.getDni());
         verify(userRepository).findByEmail(TEST_EMAIL);
+        verify(userRepository, never()).save(any());
+        verifyNoInteractions(userMapper);
+    }
+
+    //Objetivo: Registro de Usuario (registerUser) - Caso de Fallo (Duplicado DNI)
+
+    @Test
+    void registerUser_Fails_ThrowsDuplicatedDniException() {
+        when(userRepository.existsByDni(registerDto.getDni())).thenReturn(true);
+
+        assertThrows(DuplicatedDataException.class, () -> userServiceImpl.registerUser(registerDto));
+
+        verify(userRepository).existsByDni(registerDto.getDni());
+        verify(userRepository, never()).findByEmail(any());
         verify(userRepository, never()).save(any());
         verifyNoInteractions(userMapper);
     }
@@ -112,17 +126,13 @@ class UserServiceImplTest {
 
     @Test
     void getUserById_Success_ReturnsUser() {
-        // 2. Establecer comportamientos simulados
         when(userRepository.findById(TEST_ID)).thenReturn(Optional.of(userTest));
         when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
 
-        // 3. Llamar al metodo a probar
         var result = userServiceImpl.getUserById(TEST_ID);
 
-        // 4. Verificar los resultados
         assertNotNull(result);
 
-        // 5. Verificar interacciones
         verify(userRepository).findById(TEST_ID);
         verify(userMapper).toUserResponseDto(userTest);
     }
@@ -131,13 +141,10 @@ class UserServiceImplTest {
 
     @Test
     void getUserById_Fails_ThrowsDataNotFoundException() {
-        // 2. Establecer comportamientos simulados
         when(userRepository.findById(TEST_ID)).thenReturn(Optional.empty());
 
-        // 3. Llamar al metodo y esperar la excepcion
         assertThrows(DataNotFoundException.class, () -> userServiceImpl.getUserById(TEST_ID));
 
-        // 5. Verificar interacciones
         verify(userRepository).findById(TEST_ID);
         verifyNoInteractions(userMapper);
     }

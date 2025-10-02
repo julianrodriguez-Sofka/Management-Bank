@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 public class UserResponseDto {
     private Long id;
+    private String dni;
     private String username;
     private String email;
     private String password;

@@ -16,6 +16,10 @@ import lombok.NoArgsConstructor;
 @Setter
 public class UserRegistrationDto {
 
+    @NotBlank(message = "El DNI es obligatorio.")
+    @Size(min = 6, max = 15, message = "El DNI debe tener entre 6 y 15 caracteres.")
+    private String dni; // 🛑 CAMPO DNI AÑADIDO
+
     @NotBlank(message = "El nombre de usuario no puede estar vacío.")
     private String username;
 

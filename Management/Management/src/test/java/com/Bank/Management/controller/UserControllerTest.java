@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -41,6 +43,8 @@ class UserControllerTest {
 
     private final Long TEST_ID = 1L;
     private final Long NON_EXISTENT_ID = 99L;
+
+    private final String TEST_DNI = "12345678X";
     private final String TEST_EMAIL = "test@bank.com";
     private final String TEST_USERNAME = "TestUser";
 
@@ -52,9 +56,8 @@ class UserControllerTest {
                 .build();
 
         objectMapper = new ObjectMapper();
-
-        registerDto = new UserRegistrationDto(TEST_USERNAME, TEST_EMAIL, "securePwd123");
-        responseDto = new UserResponseDto(TEST_ID, TEST_USERNAME, TEST_EMAIL, "CUSTOMER", new ArrayList<>());
+        registerDto = new UserRegistrationDto(TEST_DNI, TEST_USERNAME, TEST_EMAIL, "securePwd123");
+        responseDto = new UserResponseDto(TEST_ID, TEST_DNI, TEST_USERNAME, TEST_EMAIL, "CUSTOMER", new ArrayList<>());
         updateDto = new UpdateUserDTO(TEST_ID, "NewName", TEST_EMAIL, "NewPwd123");
     }
 
@@ -70,17 +73,33 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(registerDto)))
                 .andExpect(status().isCreated()) // Espera 201 Created
                 .andExpect(jsonPath("$.id").value(TEST_ID))
-                .andExpect(jsonPath("$.email").value(TEST_EMAIL));
+                .andExpect(jsonPath("$.dni").value(TEST_DNI)); // 🛑 Verificar el DNI
 
         // 5. Verificar interacciones
         Mockito.verify(userService).registerUser(Mockito.any(UserRegistrationDto.class));
+    }
+    @Test
+    void registerUser_Fails_DniDuplicated() throws Exception {
+        // 2. Establecer comportamientos simulados
+        Mockito.when(userService.registerUser(Mockito.any(UserRegistrationDto.class)))
+                .thenThrow(new DuplicatedDataException("DNI", TEST_DNI));
+
+        // 3. y 4. Llamar al método a probar y verificar
+        mockMvc.perform(post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El DNI '" + TEST_DNI + "' ya existe y debe ser único."));
+
+        // 5. Verificar interacciones
+        verify(userService).registerUser(Mockito.any(UserRegistrationDto.class));
     }
 
     // Objetivo: Actualizar un usuario exitosamente (PUT /api/users/update)
     @Test
     void updateUser_Success() throws Exception {
         // 1. Datos de salida simulados después de la actualización
-        UserResponseDto updatedUserDto = new UserResponseDto(TEST_ID, "NewName", TEST_EMAIL, "CUSTOMER", new ArrayList<>());
+        UserResponseDto updatedUserDto = new UserResponseDto(TEST_ID, TEST_DNI, "NewName", TEST_EMAIL, "CUSTOMER", new ArrayList<>());
 
         // 2. Establecer comportamientos simulados
         Mockito.when(userService.update(Mockito.any(UpdateUserDTO.class))).thenReturn(updatedUserDto);
@@ -97,13 +116,13 @@ class UserControllerTest {
         Mockito.verify(userService).update(Mockito.any(UpdateUserDTO.class));
     }
 
-    //Objetivo: Fallo al registrar por datos inválidos (Email vacío o mal formato)
+    //Objetivo: Fallo al registrar por datos inválidos (Email/DNI vacío o mal formato)
     @Test
     void registerUser_InvalidData() throws Exception {
-        // 1. Datos de entrada inválidos (DTO sin email o con formato incorrecto)
-        UserRegistrationDto invalidDto = new UserRegistrationDto("Invalido", "", "pass");
+        // 1. Datos de entrada inválidos (DTO con DNI vacío)
+        UserRegistrationDto invalidDto = new UserRegistrationDto("", "Invalido", TEST_EMAIL, "pass");
 
-        // 2. Comportamiento simulado: Como el Controller tiene @Valid, el fallo ocurre antes de llamar al servicio.
+        // 2. Comportamiento simulado: Falla por validación del Controller.
 
         // 3. y 4. Llamar al metodo a probar y verificar (Esperar 400 Bad Request)
         mockMvc.perform(post("/api/users/register")

@@ -13,15 +13,12 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {BankAccountMapper.class})
 public interface UserMapper {
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bankAccounts", ignore = true)
     User toUser(UserRegistrationDto userRegistrationDto);
-
     UserResponseDto toUserResponseDto(User user);
 
     List<UserResponseDto> toUserResponseDtoList(List<User> userList);
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bankAccounts", ignore = true)
     void updateUserFromDto(UpdateUserDTO dto, @MappingTarget User user);
