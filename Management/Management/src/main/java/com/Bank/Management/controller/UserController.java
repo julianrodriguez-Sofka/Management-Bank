@@ -18,6 +18,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+// L: Se cumple porque el UserController espera un objeto del tipo
+// UserService y Spring inyecta la implementación concreta UserServiceImpl.
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -58,3 +60,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
+
+// D: el módulo de alto nivel (UserController) no depende del módulo de bajo nivel (UserServiceImpl),
+// sino de la abstracción (UserService). Esto invierte el flujo de control tradicional y asegura que nuestro código sea flexible,
+// desacoplado y fácil de probar con mocks.

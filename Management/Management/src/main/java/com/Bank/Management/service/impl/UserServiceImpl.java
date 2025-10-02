@@ -75,3 +75,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 }
+
+// O (Constructor): UserServiceImpl depende de una abstraccion (UserRepository) y no de una implementacion concreta
+// si cambiamos la capa de persistencia con una nueva extension, no afectamos la logica de negocio
+// y mantenemos la estabilidad del proyecto

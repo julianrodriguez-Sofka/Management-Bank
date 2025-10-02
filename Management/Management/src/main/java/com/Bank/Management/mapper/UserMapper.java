@@ -17,9 +17,12 @@ public interface UserMapper {
     @Mapping(target = "bankAccounts", ignore = true)
     User toUser(UserRegistrationDto userRegistrationDto);
     UserResponseDto toUserResponseDto(User user);
+    // S: Contener la logica de mapeo entre User y UserDTO, si añado un nuevo campo en UserDTO
+// debo actualizar el mapper sin afectar el UserServiceImpl
 
     List<UserResponseDto> toUserResponseDtoList(List<User> userList);
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bankAccounts", ignore = true)
     void updateUserFromDto(UpdateUserDTO dto, @MappingTarget User user);
 }
+

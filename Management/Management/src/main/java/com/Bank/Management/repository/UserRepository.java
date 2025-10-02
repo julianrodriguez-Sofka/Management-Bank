@@ -12,3 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByDni(String dni);
 }
+
+// S: Contener la logica de persistencia de los usuarios (DB)
+// Si cambio de DB, solo cambio el repositorio y sus drivers sin afectar UserServiceImpl

@@ -14,3 +14,7 @@ public interface UserService {
     UserResponseDto update(UpdateUserDTO updateUserDTO);
     void delete(Long id);
 }
+
+// I: Se cumple al tener interfaces segregades, mi UserController solo inyecta la interfaz UserService
+// No estoy forzando a mi UserController a depender de la TransactionService o BankAccountService, que no utiliza.
+// Si la interfaz de Transacciones cambia, no afecta a UserController.
