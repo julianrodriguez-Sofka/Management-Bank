@@ -40,6 +40,7 @@ class UserServiceImplTest {
     private final String TEST_EMAIL = "test@bank.com";
     private final Long TEST_ID = 1L;
     private final String TEST_DNI = "12345678X";
+    private final String NEW_DNI = "98765432Y";
 
     @BeforeEach
     void setUp() {
@@ -50,6 +51,7 @@ class UserServiceImplTest {
         userTest.setUsername("TestUser");
         userTest.setEmail(TEST_EMAIL);
         userTest.setPassword("hashed_password");
+        userTest.setDni(TEST_DNI);
 
         registerDto = new UserRegistrationDto(
                 TEST_DNI,
@@ -167,16 +169,26 @@ class UserServiceImplTest {
     // Objetivo: Actualizar Usuario (update) - Caso de Éxito
     @Test
     void update_Success_ReturnsUpdatedUser() {
-        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, "NewName", "new@bank.com", "NewPassword");
+        // Creamos un DTO con el DNI existente para probar que NO haya validación si el DNI no cambia
+        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, TEST_DNI, "NewName", "new@bank.com", "NewPassword");
         User updatedUserEntity = new User();
         updatedUserEntity.setId(TEST_ID);
         updatedUserEntity.setUsername("NewName");
         updatedUserEntity.setEmail("new@bank.com");
         updatedUserEntity.setPassword("NewPassword");
+        updatedUserEntity.setDni(TEST_DNI);
 
         when(userRepository.findById(TEST_ID)).thenReturn(Optional.of(userTest));
         when(userRepository.save(any(User.class))).thenReturn(updatedUserEntity);
         when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
+
+        // Mockeamos el mapper para actualizar el DNI en la entidad para el save
+        doAnswer(invocation -> {
+            User user = invocation.getArgument(1);
+            user.setDni(TEST_DNI);
+            user.setUsername("NewName");
+            return null;
+        }).when(userMapper).updateUserFromDto(any(UpdateUserDTO.class), eq(userTest));
 
         UserResponseDto result = userServiceImpl.update(updateDto);
 
@@ -184,14 +196,60 @@ class UserServiceImplTest {
 
         verify(userRepository).findById(TEST_ID);
         verify(userMapper).updateUserFromDto(updateDto, userTest);
+        verify(userRepository, never()).existsByDni(anyString()); // 👈 Verifica que la validación no se llamó
         verify(userRepository).save(userTest);
         verify(userMapper).toUserResponseDto(updatedUserEntity);
+    }
+
+    // Objetivo: Actualizar Usuario (update) - Caso de Éxito (Modificación del DNI)
+    @Test
+    void update_Success_DniModifiedAndValidated() {
+        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, NEW_DNI, "NewName", "new@bank.com", "NewPassword");
+
+        when(userRepository.findById(TEST_ID)).thenReturn(Optional.of(userTest));
+
+        // Mockeamos la validación: El nuevo DNI NO existe en la base de datos (es único)
+        when(userRepository.existsByDni(NEW_DNI)).thenReturn(false);
+
+        when(userRepository.save(any(User.class))).thenReturn(userTest);
+        when(userMapper.toUserResponseDto(any(User.class))).thenReturn(responseDto);
+
+        // Llamada al metodo
+        userServiceImpl.update(updateDto);
+
+        // Verificaciones
+        verify(userRepository).findById(TEST_ID);
+        verify(userRepository).existsByDni(NEW_DNI);
+        verify(userMapper).updateUserFromDto(updateDto, userTest);
+        verify(userRepository).save(userTest);
+    }
+
+    // Objetivo: Actualizar Usuario (update) - Caso de Fallo (DNI Duplicado por otro usuario)
+    @Test
+    void update_Fails_ThrowsDuplicatedDataExceptionForDni() {
+        final String CONFLICTING_DNI = "11111111Z";
+        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, CONFLICTING_DNI, "NewName", "new@bank.com", "NewPassword");
+
+        // 1. El usuario a actualizar es encontrado
+        when(userRepository.findById(TEST_ID)).thenReturn(Optional.of(userTest));
+
+        // 2. Mockeamos la validación: El nuevo DNI SÍ existe en la base de datos (Conflicto)
+        when(userRepository.existsByDni(CONFLICTING_DNI)).thenReturn(true);
+
+        // Verificamos que se lance la excepción correcta
+        assertThrows(DuplicatedDataException.class, () -> userServiceImpl.update(updateDto));
+
+        // Verificaciones
+        verify(userRepository).findById(TEST_ID);
+        verify(userRepository).existsByDni(CONFLICTING_DNI);
+        verify(userMapper, never()).updateUserFromDto(any(), any());
+        verify(userRepository, never()).save(any());
     }
 
     // Objetivo: Actualizar Usuario (update) - Caso de Fallo (No encontrado)
     @Test
     void update_Fails_ThrowsDataNotFoundException() {
-        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, "NewName", "new@bank.com", "NewPassword");
+        UpdateUserDTO updateDto = new UpdateUserDTO(TEST_ID, TEST_DNI, "NewName", "new@bank.com", "NewPassword");
 
         when(userRepository.findById(TEST_ID)).thenReturn(Optional.empty());
 

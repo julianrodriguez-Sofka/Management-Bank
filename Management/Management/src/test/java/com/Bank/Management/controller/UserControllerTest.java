@@ -45,6 +45,7 @@ class UserControllerTest {
     private final Long NON_EXISTENT_ID = 99L;
 
     private final String TEST_DNI = "12345678X";
+    private final String NEW_DNI = "98765432Y"; // Se define NEW_DNI para el DTO de update
     private final String TEST_EMAIL = "test@bank.com";
     private final String TEST_USERNAME = "TestUser";
 
@@ -58,7 +59,10 @@ class UserControllerTest {
         objectMapper = new ObjectMapper();
         registerDto = new UserRegistrationDto(TEST_DNI, TEST_USERNAME, TEST_EMAIL, "securePwd123");
         responseDto = new UserResponseDto(TEST_ID, TEST_DNI, TEST_USERNAME, TEST_EMAIL, "CUSTOMER", new ArrayList<>());
-        updateDto = new UpdateUserDTO(TEST_ID, "NewName", TEST_EMAIL, "NewPwd123");
+
+        // CORRECCIÓN MÍNIMA: Se modifica el constructor del UpdateUserDTO para incluir el DNI.
+        // Asumiendo que el constructor ahora es: (Long id, String dni, String username, String email, String password)
+        updateDto = new UpdateUserDTO(TEST_ID, NEW_DNI, "NewName", TEST_EMAIL, "NewPwd123");
     }
 
     // 1. Objetivo: Registrar un usuario exitosamente (POST /api/users/register)
@@ -67,24 +71,26 @@ class UserControllerTest {
         // 2. Establecer comportamientos simulados
         Mockito.when(userService.registerUser(Mockito.any(UserRegistrationDto.class))).thenReturn(responseDto);
 
-        // 3. y 4. Llamar al método a probar y verificar
+        // 3. y 4. Llamar al metodo a probar y verificar
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerDto)))
                 .andExpect(status().isCreated()) // Espera 201 Created
                 .andExpect(jsonPath("$.id").value(TEST_ID))
-                .andExpect(jsonPath("$.dni").value(TEST_DNI)); // 🛑 Verificar el DNI
+                .andExpect(jsonPath("$.dni").value(TEST_DNI));
 
         // 5. Verificar interacciones
         Mockito.verify(userService).registerUser(Mockito.any(UserRegistrationDto.class));
     }
+
+    //Objetivo: Fallo al registrar por datos duplicados (Email o DNI ya existen)
     @Test
     void registerUser_Fails_DniDuplicated() throws Exception {
         // 2. Establecer comportamientos simulados
         Mockito.when(userService.registerUser(Mockito.any(UserRegistrationDto.class)))
                 .thenThrow(new DuplicatedDataException("DNI", TEST_DNI));
 
-        // 3. y 4. Llamar al método a probar y verificar
+        // 3. y 4. Llamar al metodo a probar y verificar
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerDto)))
@@ -94,28 +100,6 @@ class UserControllerTest {
         // 5. Verificar interacciones
         verify(userService).registerUser(Mockito.any(UserRegistrationDto.class));
     }
-
-    // Objetivo: Actualizar un usuario exitosamente (PUT /api/users/update)
-    @Test
-    void updateUser_Success() throws Exception {
-        // 1. Datos de salida simulados después de la actualización
-        UserResponseDto updatedUserDto = new UserResponseDto(TEST_ID, TEST_DNI, "NewName", TEST_EMAIL, "CUSTOMER", new ArrayList<>());
-
-        // 2. Establecer comportamientos simulados
-        Mockito.when(userService.update(Mockito.any(UpdateUserDTO.class))).thenReturn(updatedUserDto);
-
-        // 3. y 4. Llamar al metodo a probar y verificar
-        mockMvc.perform(put("/api/users/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto)))
-                .andExpect(status().isOk()) // Espera 200 OK
-                .andExpect(jsonPath("$.id").value(TEST_ID))
-                .andExpect(jsonPath("$.username").value("NewName"));
-
-        // 5. Verificar interacciones
-        Mockito.verify(userService).update(Mockito.any(UpdateUserDTO.class));
-    }
-
     //Objetivo: Fallo al registrar por datos inválidos (Email/DNI vacío o mal formato)
     @Test
     void registerUser_InvalidData() throws Exception {

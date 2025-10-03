@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern; // 👈 1. Importación necesaria
 import lombok.*;
 
 @Data
@@ -17,6 +18,9 @@ public class UpdateUserDTO {
     @NotNull(message = "El ID del usuario es obligatorio para la actualización.")
     @Positive(message = "El ID del usuario debe ser un número positivo.")
     private Long id;
+
+    @Pattern(regexp = "^[0-9]{8}$", message = "El DNI debe contener exactamente 8 dígitos.")
+    private String dni;
 
     @Size(min = 3, max = 50, message = "El nombre de usuario debe tener entre 3 y 50 caracteres.")
     private String username;

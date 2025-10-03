@@ -61,7 +61,6 @@ class TransactionServiceImplTest {
         sourceAccount.setId(1L);
         sourceAccount.setAccountNumber(SOURCE_NUM);
         sourceAccount.setBalance(INITIAL_SOURCE_BALANCE.doubleValue());
-        // Inicializar las listas de transacciones (aunque Mockito las ignora, es buena práctica)
         sourceAccount.setOutgoingTransactions(new ArrayList<>());
         sourceAccount.setIncomingTransactions(new ArrayList<>());
 
